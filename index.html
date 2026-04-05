@@ -1,6 +1,144 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <title>分类待办清单</title>
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 500px;
+      margin: 50px auto;
+      text-align: center;
+    }
+    input, select {
+      padding: 10px;
+      margin: 5px;
+    }
+    button {
+      padding: 10px;
+      margin: 5px;
+      cursor: pointer;
+    }
+    li {
+      list-style: none;
+      margin: 10px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+    .done {
+      text-decoration: line-through;
+      color: gray;
+    }
+    .work { color: red; }
+    .study { color: blue; }
+    .life { color: green; }
+  </style>
+</head>
+
+<body>
+
+<h1>📋 分类待办清单</h1>
+
+<input id="taskInput" placeholder="输入任务..." />
+
+<select id="category">
+  <option value="work">工作</option>
+  <option value="study">学习</option>
+  <option value="life">生活</option>
+</select>
+
+<button onclick="addTask()">添加</button>
+<button onclick="clearTasks()">清空全部</button>
+
+<p id="count"></p>
+
+<ul id="list"></ul>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+function saveTasks() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function updateCount() {
+  document.getElementById("count").innerText =
+    "任务数量：" + tasks.length;
+}
+
+function render() {
+  let list = document.getElementById("list");
+  list.innerHTML = "";
+
+  tasks.forEach((task, index) => {
+    let li = document.createElement("li");
+
+    let span = document.createElement("span");
+    span.innerText = "[" + task.category + "] " + task.text;
+
+    span.classList.add(task.category);
+    if (task.done) span.classList.add("done");
+
+    span.onclick = () => {
+      tasks[index].done = !tasks[index].done;
+      saveTasks();
+      render();
+    };
+
+    let delBtn = document.createElement("button");
+    delBtn.innerText = "❌";
+    delBtn.onclick = () => {
+      tasks.splice(index, 1);
+      saveTasks();
+      render();
+    };
+
+    li.appendChild(span);
+    li.appendChild(delBtn);
+    list.appendChild(li);
+  });
+
+  updateCount();
+}
+
+function addTask() {
+  let input = document.getElementById("taskInput");
+  let category = document.getElementById("category").value;
+
+  if (input.value.trim() === "") return;
+
+  tasks.push({
+    text: input.value,
+    category: category,
+    done: false
+  });
+
+  input.value = "";
+  saveTasks();
+  render();
+}
+
+// 回车添加
+document.getElementById("taskInput").addEventListener("keypress", 
+function(e) {
+  if (e.key === "Enter") addTask();
+});
+
+function clearTasks() {
+  if (confirm("确定清空所有任务？")) {
+    tasks = [];
+    saveTasks();
+    render();
+  }
+}
+
+render();
+</script>
+
+</body>
+</html><!DOCTYPE 
+html>
+<html>
+<head>
   <title>待办清单 App</title>
   <style>
     body {
